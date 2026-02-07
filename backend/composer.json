@@ -1,0 +1,17 @@
+{
+    "name": "contatoseguro/teste_qa_jr",
+    "type": "project",
+    "autoload": {
+        "psr-4": {
+            "ContatoSeguro\\": ""
+        }
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^9.5"
+    },
+    "require": {
+        "slim/slim": "^4.9",
+        "slim/psr7": "^1.5",
+        "symfony/var-dumper": "^6.0"
+    }
+}

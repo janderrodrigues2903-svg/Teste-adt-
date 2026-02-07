@@ -1,0 +1,55 @@
+version: '3.8'
+
+services:
+  db:
+    image: mysql:8.0.32
+    container_name: qa_test_db
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./db:/docker-entrypoint-initdb.d
+    ports:
+      - 3400:3306
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+    ulimits:
+      nproc: 65535
+      nofile:
+        soft: 20000
+        hard: 40000
+    command: --sql_mode=""
+
+  backend:
+    build:
+      context: ./backend
+    container_name: qa_test_backend
+    working_dir: /var/www/html
+    depends_on:
+      - db
+    ports:
+      - 8400:80
+    volumes:
+      - ./backend:/var/www/html
+    command: sh -c "composer install && apache2-foreground"
+
+  frontend:
+    image: node:16.20.1-alpine
+    container_name: qa_test_frontend
+    user: root
+    depends_on:
+      - backend
+    environment:
+      - WDS_SOCKET_PORT=0
+    ports:
+      - 5400:3000
+    volumes:
+      - ./frontend:/app
+    working_dir: /app
+    command: sh -c "npm install --legacy-peer-deps --verbose && npm start"
+
+networks:
+  default:
+    name: qa_test_network
+
+volumes:
+  db_data:
+    name: test_qa_db_data
